@@ -28,6 +28,7 @@ export BOOST_ROOT=/usr/soft/boost
 
 Then simply type the following commands:
 
+mkdir build
 cd build  
 cmake ..  
 make

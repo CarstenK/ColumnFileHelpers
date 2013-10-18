@@ -4,6 +4,9 @@
  *  Created on: Jun 18, 2013
  *      Author: Carsten Kemena
  *
+ *   Copyright 2013 Carsten Kemena
+ *   Email CarstenK[at]posteo.de
+ *
  *
  * This file is part of LittleToolBox.
  *
