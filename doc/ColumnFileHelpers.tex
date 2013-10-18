@@ -1,0 +1,267 @@
+\documentclass[a4paper,10pt,parskip=half]{scrreprt}
+\usepackage[utf8]{inputenc}
+% \usepackage[hidelinks]{hyperref}
+\usepackage[pdfauthor={Carsten Kemena},colorlinks=true,linkcolor=blue, urlcolor=blue,  pdftitle={ColumnFileHelpers - Manual}]{hyperref}
+
+\usepackage{listings}
+
+
+\usepackage[usenames,dvipsnames]{xcolor}
+ 
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{code_background}{RGB}{255,245,147}
+
+% Title Page
+\title{ColumnFileHelpers}
+\subtitle{Version 1.0}
+\author{Carsten Kemena}
+
+
+\begin{document}
+\maketitle
+
+
+
+\lstset{ %
+  language=bash,                % the language of the code
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+                 % the step between two line-numbers. If it's 1, each line 
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{code_background},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+  escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+  morekeywords={PROMPT},              % if you want to add more keywords to the set
+  deletekeywords={}              % if you want to delete keywords from the given language
+}
+
+
+
+\begin{abstract}
+This is a small and simple tool suite containing several small programs (well, currently only two :).
+\end{abstract}
+
+
+\tableofcontents
+
+\chapter{colsum}
+
+\textit{colsum} can sum up (or produce an average) of column-wise values. Several columns can be specified and it is furthermore possible to specify rows to take into account according to a given pattern.
+
+\section{Options}
+
+\textit{colsum} supports many options to facilitate the use of it. In this section all of them explained.
+
+\subsection{General Options}
+
+This sections describes the general input and output options.
+
+\begin{table}[h]
+\caption{General options which can be used with \textit{colsum}.}
+\begin{tabular}{lcp{7cm}}\hline
+option& default & effect \\\hline
+ \texttt{-h (--help)}&- & Produces a simple help message\\
+ \texttt{-i (--in)} &-& The input file. Data can be piped in as well\\
+ \texttt{-o (--out)} &-& The output file. If none is given, output is written to stdout\\
+ \texttt{-n (--no-header)} &\textit{false} & Suppresses the printing of the header\\ 
+ \texttt{-r (--round)} & \textit 2 & The number of digits to print after decimal point.\\\hline
+ \end{tabular}
+\end{table}
+
+\subsubsection{Details}
+
+\hangindent+25pt \hangafter=1
+\textbf{i, in}: The file to analyze. When no file is set \textit{colsum} reads from the pipe.
+
+\hangindent+25pt \hangafter=1
+\textbf{o, out}: The output is written to the file given with this parameter. If no file is given, the output will be printed to the terminal. By default a header is printed containing the column ids. 
+
+\hangindent+25pt \hangafter=1
+\textbf{n, no-header}: No header information is printed.
+
+\hangindent+25pt \hangafter=1
+\textbf{r, round}: The number of digits to print after decimal point. This value will be applied to all values produced.
+
+
+\subsubsection*{Examples}
+The examples below show the usage of these basic input and output options (input files can be found in the test/colsum directory):
+ \lstset{language=bash}
+\begin{lstlisting}[language=bash,frame=none,morekeywords={PROMPT}]
+ # use textfile as source and write to terminal
+ PROMPT: colsum -i test1.txt -c 2 -d " "
+ 2
+ 10.00
+ 
+ # pipe input into colsum and write result to "col1.txt"
+ PROMPT: less test1.txt | colsum -i test1.txt -c 2 -d " " -o col1.txt
+ 
+ # calculate average of column 4, print only one digit after decimal point and do not print a header
+ PROMPT: colsum -i test1.txt -d " " -c 4 -r 1 -a --no-header
+ 5.5
+ \end{lstlisting}
+ 
+ 
+\subsection{Input Format Options}
+
+This section described the options to manage the input format. 
+ \begin{table}[h]
+ \caption{Options of \textit{colsum} for managing the format of the input.}
+ \begin{tabular}{lcp{7cm}}\hline
+ option& default & effect \\\hline
+ \texttt{-d (--delimiter)}& \textit{tab} & The delimiter to use\\
+ \texttt{-m (--merge)} &\textit{false}& Consecutive delimiters are counted as only one\\
+ \texttt{-c (--columns)} &-& The columns to use\\
+ \texttt{-k (--grouping)} & 1 & The rows which should be summed up\\
+ \texttt{-p (--patterns)} & - & The patterns to use for summing up\\
+ \texttt{-l (--skip\_lines)} &0 & Skips the first $n$ lines of the file\\
+\end{tabular}
+\end{table}
+
+
+\subsubsection{Details}
+
+\hangindent+25pt \hangafter=1
+\textbf{d, delimiter}: The delimiter to use, by default this is the '\textit{tab}' character. Only one delimiter can be used at a time. Consecutive delimiters in the input are \textbf{not} merged \textbf{unless} the '-m/--merge' parameter is set. The column id is increased for each delimiter.
+
+\hangindent+25pt \hangafter=1
+\textbf{m, merge}: If this option is set consecutive delimiters are treated as a single, thus the columns are only changed when encountering a non-delimiter.
+
+\hangindent+25pt \hangafter=1
+\textbf{c, columns}: A string defining the columns to process. Values are separated by comma. Several consecutive columns can be set by combining the first and the last column by '-'. If a line starts with a delimiter the column after the delimiter is considered to be the second. The order of columns is unimportant, the output will \textbf{always} be ordered from first to last position.
+
+\hangindent+25pt \hangafter=1
+\textbf{k, grouping}: This option defines which row to sum up into a single value. By default all rows are summed up into one value. If $k>1$, $k$ values are computed, each containing the values of each k-th row (e.g. k=2: The first value will contain rows 1,3,5,\dots and the second 2,4,6,\dots.
+
+\hangindent+25pt \hangafter=1
+\textbf{p, patterns}: This parameter is used to specify rows matching a certain pattern. If several patterns are provided, the values of the rows are treated separately. If more than one patterns matches to the same row the values are used in each pattern. A pattern is a regular expression which is used to identify the rows to use. \textit{colsum} will search for this patterns in the \textbf{whole} line. If the pattern occurs at any position the values of the specified colums will be used. The pattern can appear anywhere in the line (e.g. using 'day' as pattern, rows containing 'Friday' and 'Monday' will be summed up together even when they occur in different columns! Values of rows matching more than one pattern will be added to each pattern. Rows without any pattern are ignored. A column is added to the output identifying the group. The pattern is interpreted as a regular expression as specified in Perl. See the  \href{http://www.boost.org/doc/libs/1_53_0/libs/regex/doc/html/boost_regex/syntax/perl_syntax.
+html}{Boost webpage} or the \href{http://perldoc.perl.org/perlre.html#Regular-Expressions}{Perl webpage} for more details. Each pattern has to be surrounded by ''.
+
+\hangindent+25pt \hangafter=1
+\textbf{l, skip\_lines}: The first $n$ lines of the files are skipped and not taken into account.
+
+\subsubsection*{Examples}
+The following examples make use of these parameters (input files can be found in the test/colsum directory):
+
+\begin{lstlisting}[language=bash,frame=none,morekeywords={PROMPT}]
+ # sum up only column 2
+ PROMPT: colsum -i test1.txt -c 2 -d " "
+ 2
+ 10.00
+ 
+ # sum up column 3,5 and 7
+ PROMPT: colsum -i test1.txt -c 3,5,7 -d " " -o col1.txt
+ 3 5 7
+ 18.00 16.00 24.00
+ 
+ # sum up columns 3 and 5,6,7
+ PROMPT: colsum -i test1.txt -c 3,5-7 -d " " -o col1.txt
+ 3 5 6 7
+ 18.00 16.00 20.00 24.00
+ 
+ # merge delimiters
+ PROMPT: colsum -i test2.txt -c 4 -d " " -m -n
+ 17.00
+ 
+ # add up every second row
+ PROMPT: colsum -i test2.txt -c 4 -d " " -m -k 2
+ 4                                                                                                  
+ 5.00                                                                                                   
+ 12.00
+
+ # Summing up rows having the same pattern. A row value can be added to more than one pattern!
+ PROMPT: colsum -i test2.txt -c 2-3 -d " " -m -p Monday Frida day -a
+ group 2 3
+ Monday 2.50 5.50
+ Frida 2.50 4.50
+ day 2.50 5.00
+\end{lstlisting}
+ 
+ 
+ 
+\subsection{Algorithmic options}
+
+This sections describes the behaviour of the program. Only one of the available options can be choosen. If none is choosen the sum is calculated.
+
+\begin{table}[h]
+\caption{Algorithmic options which can be used with \textit{colsum}.}
+\begin{tabular}{lcp{7cm}}\hline
+option& default & effect \\\hline
+ \texttt{-a (--average)} &\textit{false}& Calculates the average of all values\\
+ \texttt{--max} &\textit{false}& Calculates the maximum of all values\\
+ \texttt{--min} &\textit{false}& Calculates the minimum of all values\\
+ \end{tabular}
+\end{table}
+
+\subsubsection{Details}
+
+\hangindent+25pt \hangafter=1
+\textbf{a, average}: If set the average is caluclated instead of the sum.
+
+\hangindent+25pt \hangafter=1
+\textbf{max}: Calculates the minimum.
+
+\hangindent+25pt \hangafter=1
+\textbf{min}: Calcualtes the minimum.
+
+
+
+\chapter{rowmerge}
+
+
+\textit{rowmerge} is able to combine multiple files into a single one. 
+
+\section{Options}
+\begin{table}[h]
+\caption{Options which can be used with \textit{colsum}.}
+\begin{tabular}{lcp{7cm}}\hline
+options& default & effect \\\hline
+ \texttt{-h (--help)}&- & Produces a simple help message\\
+ \texttt{-i (--in)} &-& The input file. Data can be piped in as well.\\
+ \texttt{-o (--out)} &-& The output file. If none is given, output is written to stdout.\\
+ \texttt{-c (--col)} &-& Columns in file.\\
+ \texttt{-d (--delimiter)} & \textit{tab} & Delimiter. \\
+ \texttt{-m (--merge)} & False & Consecutive delimiters are treated as one
+%  \texttt{-a (--average)} &\textit{false}& Instead of calculating the total sum the average is calculated.\\
+
+\end{tabular}
+\end{table}
+
+\subsubsection{Details}
+
+\hangindent+25pt \hangafter=1
+\textbf{i, in}: The files to merge, can be any number but has to be at least
+two.
+
+\hangindent+25pt \hangafter=1
+\textbf{o, out}: The output is written to the file given with this parameter. If
+no file is given, the output will be printed to the terminal. The output does
+not come in any specific order.
+
+\hangindent+25pt \hangafter=1
+\textbf{c, col}: If not set the column which is merged is used merging is
+detected automatically. The first line is used to find equal names between the
+first two files to set the name identifier for all other files. 
+If a number is given, it idetnifies the column to used to merge the files. If a single column is given it is used for every file, else the number has to be equal to the number of input files.
+
+\hangindent+25pt \hangafter=1
+\textbf{d, delimiter}: The file delimiter to use. 
+
+\hangindent+25pt \hangafter=1
+\textbf{m, merge}: If set, several consecutive delimiters are merged into one.
+
+\end{document}          

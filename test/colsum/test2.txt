@@ -1,0 +1,4 @@
+Monday 3 4 4 4 5	6	6 78
+Monday 2 7   6 4	5	6 6 78
+Friday 3 4 1 4 5	6	6 78
+Friday 2 5 6 4 7	6	6 78
