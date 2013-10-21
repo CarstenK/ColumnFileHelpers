@@ -3,7 +3,7 @@ ColumnFileHelpers
 
 A set of simple commandline tools to make life easier when dealing with data that is organized in columns
 
-colsum - A program to calculate the column sum or average of a simple textfile or pipe
+colsum - A program to calculate the column sum/average or min/max of a simple textfile or pipe
 
 rowmerge - A program to merge rows of different files into a single file according to a given column
 
