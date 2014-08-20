@@ -11,16 +11,16 @@
  * This file is part of LittleToolBox.
  *
  * LittleToolBox is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * LittleToolBox is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU General Public License
  * along with LittleToolBox.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -41,6 +41,7 @@
 #include <boost/program_options.hpp>
 #include <boost/regex.hpp>
 
+#include "Version.hpp"
 
 using namespace std;
 
@@ -205,7 +206,7 @@ main(int argc, char *argv[])
 	//	("sum,s", po::value<bool>(&sum)->default_value(false)->zero_tokens(), "Calculates the maximum")
 	;
 
-	po::options_description all("colsum v1.0\n\nAllowed options are displayed below.");
+	po::options_description all("colsum (" + version + ") Copyright (C) 2014  Carsten Kemena\nThis program comes with ABSOLUTELY NO WARRANTY;\n\nAllowed options are displayed below.");
 	all.add(general_opts).add(table_opts).add(output_opts);
 	po::variables_map vm;
 	po::store(po::command_line_parser(argc, argv).options(all).run(), vm);

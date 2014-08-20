@@ -11,16 +11,16 @@
  * This file is part of LittleToolBox.
  *
  * LittleToolBox is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * LittleToolBox is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU General Public License
  * along with LittleToolBox.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -46,6 +46,7 @@ using boost::lexical_cast;
 using boost::bad_lexical_cast;
 namespace po = boost::program_options;
 
+#include "Version.hpp"
 
 void
 parse_line(const string &line, char delim, int col_id, size_t &start, size_t &end, size_t n_line, bool merge, string in_f)
@@ -102,7 +103,7 @@ main(int argc, char *argv[])
 		("merge,m", po::value<bool>(&merge)->default_value(false), "Consecutive delimiters are treated as one")
 	;
 
-	po::options_description all("rowmerge v1.0\n");
+	po::options_description all("rowmerge (" + version + ") Copyright (C) 2014  Carsten Kemena\nThis program comes with ABSOLUTELY NO WARRANTY;\n\nAllowed options are displayed below.");
 	all.add(general_opts);
 	po::variables_map vm;
 	po::store(po::command_line_parser(argc, argv).options(all).run(), vm);
@@ -140,7 +141,7 @@ main(int argc, char *argv[])
 
 	string dels="";
 	dels.push_back(delim);
-	int col;
+	int col=-100;
 	string col_name;
 	bool automatic = false;
 	boost::algorithm::token_compress_mode_type compress_mode;
