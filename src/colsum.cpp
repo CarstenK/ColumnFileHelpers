@@ -210,11 +210,24 @@ main(int argc, char *argv[])
 	all.add(general_opts).add(table_opts).add(output_opts);
 	po::variables_map vm;
 	po::store(po::command_line_parser(argc, argv).options(all).run(), vm);
-	po::notify(vm);
-	if (vm.count("help")) {
+
+	if (vm.count("help"))
+	{
 		cout << all<< "\n";
 		return EXIT_SUCCESS;
 	}
+
+	try
+	{
+		po::notify(vm);
+	}
+	catch(std::exception &e)
+	{
+		std::cerr << "Error parsing commandline: " << e.what() << endl;
+		std::cerr << "Use -h/--help for option information" << endl;
+		exit(EXIT_SUCCESS);
+	}
+
 
 	int n_options=min_value + max_value + average;
 	if (n_options > 1)
