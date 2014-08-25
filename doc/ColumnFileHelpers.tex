@@ -279,16 +279,12 @@ options& default & effect \\\hline
  \texttt{-h (--help)}&- & Produces a simple help message\\
  \texttt{-i (--in)} &-& The input file. Data can be piped in as well.\\
  \texttt{-o (--out)} &-& The output file. If none is given, output is written to stdout.\\
- \texttt{-c (--col)} &-& Columns in file.\\
- \texttt{-d (--delimiter)} & \textit{tab} & Delimiter. \\
- \texttt{-m (--merge)} & False & Consecutive delimiters are treated as one
-%  \texttt{-a (--average)} &\textit{false}& Instead of calculating the total sum the average is calculated.\\
-
+ \texttt{-d (--delimiter)} &-& Delimiter\\
+ \texttt{-f (--filter)} &-& The filterFunction to use\\
 \end{tabular}
 \end{table}
 
 \subsubsection{Details}
-
 \hangindent+25pt \hangafter=1
 \textbf{i, in}: The files to merge, can be any number but has to be at least
 two.
@@ -299,15 +295,18 @@ no file is given, the output will be printed to the terminal. The output does
 not come in any specific order.
 
 \hangindent+25pt \hangafter=1
-\textbf{c, col}: If not set the column which is merged is used merging is
-detected automatically. The first line is used to find equal names between the
-first two files to set the name identifier for all other files. 
-If a number is given, it idetnifies the column to used to merge the files. If a single column is given it is used for every file, else the number has to be equal to the number of input files.
-
-\hangindent+25pt \hangafter=1
 \textbf{d, delimiter}: The file delimiter to use. 
 
 \hangindent+25pt \hangafter=1
-\textbf{m, merge}: If set, several consecutive delimiters are merged into one.
+\textbf{f, filter}: Description of the filter to use. It consists of three parts, the columnId, the comparison function, the threshold. For example ``3$>$3.3'' means that the the values in the third column have to be larget then '3.3'.
+
+
+
+\subsubsection*{Examples}
+\begin{lstlisting}[language=bash,frame=none,morekeywords={PROMPT}]
+ rowFilter  -f "2==3.4" "3>5" -i test.txt
+\end{lstlisting}
+
+
 
 \end{document}          

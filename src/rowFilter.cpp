@@ -88,8 +88,8 @@ main(int argc, char *argv[])
 	po::options_description general_opts("General options");
 	general_opts.add_options()
 		("help,h", "Produces this help message")
-		("in,i", po::value<string>(&in_f)->required(), "Input file")
-		("out,o", po::value<string>(&out_f)->required(), "Output file")
+		("in,i", po::value<string>(&in_f), "Input file")
+		("out,o", po::value<string>(&out_f), "Output file")
 		("delimiter,d", po::value<string>(&delim)->default_value("\t"), "Delimiter")
 		("filter,f", po::value<vector<string> >(&filterFunctions)->multitoken()->required(), "The filterFunction to use")
 	;
@@ -161,12 +161,49 @@ main(int argc, char *argv[])
 		--colId;
 		vecFuncts.push_back(std::bind (columCompare, colId, filterFunc, threshold, _1));
 	}
-	ifstream inS(in_f);
-	ofstream outS(out_f);
+	//ifstream inS(in_f);
+	//ofstream outS(out_f);
 	string line;
 	int lineNum = 0;
+
+	ifstream in_F;
+	istream* in_p;
+
+	if(in_f.empty())
+		in_p = &cin;
+	else
+	{
+		in_F.open(in_f.c_str(), ifstream::in);
+		if (in_F.good())
+			in_p = &in_F;
+		else
+		{
+			cerr << "Error! Could not open file " << in_f << endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+
+
+	ofstream out_F;
+	ostream* out_p;
+	if(out_f.empty())
+		out_p = &cout;
+	else
+	{
+		out_F.open(out_f.c_str(), ifstream::out);
+		if (out_F.good())
+			out_p = &out_F;
+		else
+		{
+			cerr << "Error! Could not open file " << out_f << endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+
+
+
 	try {
-		while (getline(inS, line))
+		while (getline((*in_p), line))
 		{
 			++lineNum;
 			if (line.empty())
@@ -177,16 +214,18 @@ main(int argc, char *argv[])
 			for (auto &functs : vecFuncts)
 				passedThreshold &= functs(tokens);
 			if (passedThreshold)
-				outS << line << "\n";
+				(*out_p) << line << "\n";
 		}
 	}
 	catch (exception &e)
 	{
 		cerr << "Error occurred when parsing line " << lineNum << "!" << endl;
 	}
-	outS.close();
-	inS.close();
 
+	if (!in_f.empty())
+		in_F.close();
+	if (!out_f.empty())
+		out_F.close();
 
 	return EXIT_SUCCESS;
 }
