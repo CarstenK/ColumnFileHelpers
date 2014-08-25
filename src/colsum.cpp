@@ -323,7 +323,7 @@ main(int argc, char *argv[])
 	int x=0;
 	int line_n=0;
 
-	// skipe the specified number of lines at the start of the file
+	// skip the specified number of lines at the start of the file
 	int skip=-1;
 	while(!in_p->eof() && (++skip<skip_lines))
 		getline(*in_p, line);

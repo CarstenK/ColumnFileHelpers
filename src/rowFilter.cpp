@@ -39,7 +39,7 @@
 using namespace std;
 
 namespace po = boost::program_options;
-
+using namespace std::placeholders;
 
 
 std::vector<std::string>
@@ -63,23 +63,35 @@ split(const std::string &s, const std::string &delimiters)
 	return output;
 }
 
+/*
+bool
+columCompare(int columnId, std::function<double(const double&, const double&)> &compFunction, string value, const vector<string> &tokens)
+{
+	return compFunction(tokens[columnId], value);
+}*/
+
+
+bool
+columCompare(int columnId,  std::function<double(const double&, const double&)> &compFunction, double value, const vector<string> &tokens)
+{
+	return compFunction(stod(tokens.at(columnId)), value);
+}
+
 
 int
 main(int argc, char *argv[])
 {
 	string in_f;
 	string out_f;
-	int cols;
 	string delim;
-	string filterFunction;
+	vector<string> filterFunctions;
 	po::options_description general_opts("General options");
 	general_opts.add_options()
 		("help,h", "Produces this help message")
 		("in,i", po::value<string>(&in_f)->required(), "Input file")
 		("out,o", po::value<string>(&out_f)->required(), "Output file")
-		("col,c", po::value<int>(&cols)->required(), "Columns in file")
 		("delimiter,d", po::value<string>(&delim)->default_value("\t"), "Delimiter")
-		("filter,f", po::value<string>(&filterFunction)->required(), "The filterFunction to use")
+		("filter,f", po::value<vector<string> >(&filterFunctions)->multitoken()->required(), "The filterFunction to use")
 	;
 
 	po::options_description all("rowFilter (" + version + ") Copyright (C) 2014  Carsten Kemena\nThis program comes with ABSOLUTELY NO WARRANTY;\n\nAllowed options are displayed below.");
@@ -103,53 +115,74 @@ main(int argc, char *argv[])
 		exit(EXIT_SUCCESS);
 	}
 
-	double threshold;
-	std::function<double(const double&, const double&)> filterFunc;
-
-	if (filterFunction[0] == '>')
+	// parse filter functions
+	vector<std::function<bool(const vector<string>&)> > vecFuncts;
+	for (string &filterToken : filterFunctions)
 	{
-		if (filterFunction[1] == '=')
-		{
-			filterFunc = std::greater_equal<double>();
-			threshold = stod(filterFunction.substr(2));
-		}
-		else
-		{
-			filterFunc = std::greater<double>();
-			threshold = stod(filterFunction.substr(1));
-		}
-	}
-	if (filterFunction[0] == '<')
-	{
-		if (filterFunction[1] == '=')
-		{
-			filterFunc = std::less_equal<double>();
-			threshold = stod(filterFunction.substr(2));
-		}
-		else
-		{
-			filterFunc = std::less<double>();
-			threshold = stod(filterFunction.substr(1));
-		}
-	}
+		double threshold;
+		std::function<double(const double&, const double&)> filterFunc;
+		size_t pos = filterToken.find_first_of("=><");
+		size_t colId = std::stoi(filterToken);
+		filterToken = filterToken.substr(pos);
 
-	if ((filterFunction[0] == '=') && (filterFunction[1] == '='))
-	{
-		filterFunc = std::equal_to<double>();
-		threshold = stod(filterFunction.substr(2));
+		if (filterToken[0] == '>')
+		{
+			if (filterToken[1] == '=')
+			{
+				filterFunc = std::greater_equal<double>();
+				threshold = stod(filterToken.substr(2));
+			}
+			else
+			{
+				filterFunc = std::greater<double>();
+				threshold = stod(filterToken.substr(1));
+			}
+		}
+		if (filterToken[0] == '<')
+		{
+			if (filterToken[1] == '=')
+			{
+				filterFunc = std::less_equal<double>();
+				threshold = stod(filterToken.substr(2));
+			}
+			else
+			{
+				filterFunc = std::less<double>();
+				threshold = stod(filterToken.substr(1));
+			}
+		}
+
+		if ((filterToken[0] == '=') && (filterToken[1] == '='))
+		{
+			filterFunc = std::equal_to<double>();
+			threshold = stod(filterToken.substr(2));
+		}
+
+		--colId;
+		vecFuncts.push_back(std::bind (columCompare, colId, filterFunc, threshold, _1));
 	}
-
-	--cols;
-
 	ifstream inS(in_f);
 	ofstream outS(out_f);
 	string line;
-	while (getline(inS, line))
+	int lineNum = 0;
+	try {
+		while (getline(inS, line))
+		{
+			++lineNum;
+			if (line.empty())
+				continue;
+			std::vector<std::string> tokens = split(line, delim);
+
+			bool passedThreshold = true;
+			for (auto &functs : vecFuncts)
+				passedThreshold &= functs(tokens);
+			if (passedThreshold)
+				outS << line << "\n";
+		}
+	}
+	catch (exception &e)
 	{
-		std::vector<std::string> tokens = split(line, delim);
-		cout << stod(tokens[cols]) << endl;
-		if (filterFunc(stod(tokens[cols]), threshold))
-			outS << line << "\n";
+		cerr << "Error occurred when parsing line " << lineNum << "!" << endl;
 	}
 	outS.close();
 	inS.close();
