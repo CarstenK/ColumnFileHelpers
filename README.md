@@ -7,6 +7,9 @@ colsum - A program to calculate the column sum/average or min/max of a simple te
 
 rowmerge - A program to merge rows of different files into a single file according to a given column
 
+rowFilter - A program to extract lines of a column file using given thresholds
+
+
 Requirements
 ------------
 
