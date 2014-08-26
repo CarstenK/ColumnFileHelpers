@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project (ToolBox C CXX)
 
-set(CMAKE_CXX_FLAGS "-g -std=c++11 -Wall -Wextra -Wunused -pedantic")
+set(CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall -Wextra -Wunused -pedantic")
 
 
 
