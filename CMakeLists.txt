@@ -75,6 +75,16 @@ target_link_libraries(${rowFilter_exe}
 	${Boost_LIBRARIES}
 )
 
+################################################
+#                   csv2tex                    #
+################################################
+SET(csv2tex_src ./src/csv2tex.cpp)
+SET(csv2tex_exe csv2tex)
+ADD_EXECUTABLE(${csv2tex_exe} ${csv2tex_src})
+target_link_libraries(${csv2tex_exe}
+	${Boost_LIBRARIES}
+)
+
 install(TARGETS ${colsum_exe} ${timesum_exe} DESTINATION .)
 
 
