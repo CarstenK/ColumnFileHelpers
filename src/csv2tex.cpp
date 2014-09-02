@@ -76,10 +76,10 @@ split(const std::string &s, const std::string &delimiters)
  *
  * The string can contain "," to separate columns and "-" to denote a range of columns.
  * @param column_str The string with the encoded columns.
- * @param[out] col_ids The columns id extracted from the column_str, sorted ascending.
+ * @param[out] colIds The columns id extracted from the column_str, sorted ascending.
  */
 void
-str2col_id(const string &column_str, vector<int> &col_ids)
+str2col_id(const string &column_str, vector<int> &colIds)
 {
 	const char *str=column_str.c_str();
 	if ((!isdigit(str[0])) || (!isdigit(str[column_str.size()-1])))
@@ -105,39 +105,39 @@ str2col_id(const string &column_str, vector<int> &col_ids)
 		if (*str == ',')
 		{
 			for (i=start; i<=end; ++i)
-				col_ids.push_back(i-1);
+				colIds.push_back(i-1);
 			start=end=atoi(++str);
 		} else if (*str == '-')
 			end=atoi(++str);
 		++str;
 	}
 	for (i=start; i<=end; ++i)
-		col_ids.push_back(i-1);
+		colIds.push_back(i-1);
 
-	sort(col_ids.begin(), col_ids.end());
+	sort(colIds.begin(), colIds.end());
 }
 
 
 void
-line2tex(const string &line, ostream* out_p, const string &delim, vector<int> &colIds)
+line2tex(const string &line, ostream* outP, const string &delim, vector<int> &colIds)
 {
 	std::vector<std::string> tokens = split(line, delim);
 
 	if (colIds.empty())
 	{
-		(*out_p) << tokens[0];
+		(*outP) << tokens[0];
 		size_t len=tokens.size();
 		for (size_t i=1; i<len; ++i)
-			(*out_p) << " & " << tokens[i];
+			(*outP) << " & " << tokens[i];
 	}
 	else
 	{
-		(*out_p) << tokens[colIds[0]];
+		(*outP) << tokens[colIds[0]];
 		size_t len=colIds.size();
 		for (size_t i=1; i<len; ++i)
-			(*out_p) << " & " << tokens[colIds[i]];
+			(*outP) << " & " << tokens[colIds[i]];
 	}
-	(*out_p) << "\\\\\n";
+	(*outP) << "\\\\\n";
 }
 
 int
@@ -185,9 +185,9 @@ main(int argc, char *argv[])
 		exit(EXIT_SUCCESS);
 	}
 
-	vector<int> col_ids;
+	vector<int> colIds;
 	if (!col_str.empty())
-		str2col_id(col_str, col_ids);
+		str2col_id(col_str, colIds);
 
 	ifstream in_F;
 	istream* in_p;
@@ -208,14 +208,14 @@ main(int argc, char *argv[])
 
 
 	ofstream out_F;
-	ostream* out_p;
+	ostream* outP;
 	if(out_f.empty())
-		out_p = &cout;
+		outP = &cout;
 	else
 	{
 		out_F.open(out_f.c_str(), ifstream::out);
 		if (out_F.good())
-			out_p = &out_F;
+			outP = &out_F;
 		else
 		{
 			cerr << "Error! Could not open file " << out_f << endl;
@@ -224,32 +224,43 @@ main(int argc, char *argv[])
 	}
 
 	string line;
+	getline(*in_p, line);
+	size_t nColumns;
+	if (colIds.empty())
+	{
+		vector<string> tokens = split(line, delim);
+		nColumns = tokens.size();
+	}
+	else
+		nColumns = colIds.size();
 
 	// table
-	(*out_p) << "\\begin{tabular}{";
-	for (size_t i=0; i<col_ids.size(); ++i)
-		(*out_p) << "r";
-	(*out_p) <<"}\n";
+	(*outP) << "\\begin{tabular}{";
+	for (size_t i=0; i<nColumns; ++i)
+		(*outP) << "r";
+	(*outP) <<"}\n";
 
 	if (!no_header)
 	{
-		getline(*in_p, line);
-		(*out_p) << "\\hline" << "\n";
-		line2tex(line, out_p, delim, col_ids);
-		(*out_p) << "\\hline" << "\n";
+
+		(*outP) << "\\hline" << "\n";
+		line2tex(line, outP, delim, colIds);
+		(*outP) << "\\hline" << "\n";
 	}
+	else
+		line2tex(line, outP, delim, colIds);
 
 
 	while (getline(*in_p, line))
 	{
-		line2tex(line, out_p, delim, col_ids);
+		line2tex(line, outP, delim, colIds);
 	}
 
 
 	// end table
 	if (!no_header)
-		(*out_p) << "\\hline" << "\n";
-	(*out_p) << "\\end{tabular}\n";
+		(*outP) << "\\hline" << "\n";
+	(*outP) << "\\end{tabular}\n";
 
 
 
