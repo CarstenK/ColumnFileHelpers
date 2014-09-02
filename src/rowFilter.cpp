@@ -90,7 +90,7 @@ main(int argc, char *argv[])
 		("help,h", "Produces this help message")
 		("in,i", po::value<string>(&in_f), "Input file")
 		("out,o", po::value<string>(&out_f), "Output file")
-		("delimiter,d", po::value<string>(&delim)->default_value("\t"), "Delimiter")
+		("delimiter,d", po::value<string>(&delim)->default_value("\t", "TAB"), "Delimiter")
 		("filter,f", po::value<vector<string> >(&filterFunctions)->multitoken()->required(), "The filterFunction to use")
 	;
 

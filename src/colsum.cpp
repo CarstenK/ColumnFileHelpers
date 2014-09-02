@@ -189,7 +189,7 @@ main(int argc, char *argv[])
 
 	po::options_description table_opts("Input format options");
 	table_opts.add_options()
-		("delimiter,d", po::value<char>(&delim)->default_value('\t'), "Delimiter to use")
+		("delimiter,d", po::value<char>(&delim)->default_value('\t', "TAB"), "Delimiter to use")
 		("merge,m", po::value<bool>(&merge)->default_value(false)->zero_tokens(), "Merge several separators into one")
 		("columns,c", po::value<string>(&col_str)->required(), "The columns to use")
 		("grouping,k", po::value<int>(&k)->default_value(1), "Every k-th row will be grouped together")

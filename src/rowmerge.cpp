@@ -99,7 +99,7 @@ main(int argc, char *argv[])
 		("in,i", po::value<vector<string> >(&in_f)->multitoken(), "Input file")
 		("out,o", po::value<string>(&out_f), "Output file")
 		("col,c", po::value<vector<int> >(&cols)->multitoken(), "Columns in file")
-		("delimiter,d", po::value<char>(&delim)->default_value('\t'), "Delimiter")
+		("delimiter,d", po::value<char>(&delim)->default_value('\t', "TAB"), "Delimiter")
 		("merge,m", po::value<bool>(&merge)->default_value(false), "Consecutive delimiters are treated as one")
 	;
 

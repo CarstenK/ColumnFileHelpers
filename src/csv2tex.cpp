@@ -75,7 +75,7 @@ split(const std::string &s, const std::string &delimiters)
 void
 replace(string &line)
 {
-	string characters = "_%";
+	string characters = "_%#";
 	size_t pos = 0;
 	string re;
 	for (char c : characters)
@@ -180,7 +180,7 @@ main(int argc, char *argv[])
 
 	po::options_description table_opts("Input format options");
 	table_opts.add_options()
-		("delimiter,d", po::value<string>(&delim)->default_value("\t"), "Delimiter to use")
+		("delimiter,d", po::value<string>(&delim)->default_value("\t", "TAB"), "Delimiter to use")
 		("columns,c", po::value<string>(&col_str), "The columns to use")
 	;
 
