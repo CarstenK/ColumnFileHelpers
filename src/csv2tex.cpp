@@ -71,6 +71,27 @@ split(const std::string &s, const std::string &delimiters)
 	return output;
 }
 
+
+void
+replace(string &line)
+{
+	string characters = "_%";
+	size_t pos = 0;
+	string re;
+	for (char c : characters)
+	{
+		while ((pos=line.find(c, pos)) != string::npos)
+		{
+			re = "\\";
+			re.push_back(c);
+			line.replace(pos,1,re);
+			pos+=2;
+		}
+		pos = 0;
+	}
+}
+
+
 /**
  * \brief Turns a string into column ids.
  *
@@ -119,10 +140,10 @@ str2col_id(const string &column_str, vector<int> &colIds)
 
 
 void
-line2tex(const string &line, ostream* outP, const string &delim, vector<int> &colIds)
+line2tex(string &line, ostream* outP, const string &delim, vector<int> &colIds)
 {
+	replace(line);
 	std::vector<std::string> tokens = split(line, delim);
-
 	if (colIds.empty())
 	{
 		(*outP) << tokens[0];
@@ -242,7 +263,6 @@ main(int argc, char *argv[])
 
 	if (!no_header)
 	{
-
 		(*outP) << "\\hline" << "\n";
 		line2tex(line, outP, delim, colIds);
 		(*outP) << "\\hline" << "\n";
