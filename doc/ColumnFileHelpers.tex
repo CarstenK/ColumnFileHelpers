@@ -220,6 +220,52 @@ option& default & effect \\\hline
 
 
 
+\chapter{csv2tex}
+
+
+\textit{csv2tex} is a simple program to turn a columns file into a latex table.
+
+\section{Options}
+\begin{table}[h]
+\caption{Options which can be used with \textit{colsum}.}
+\begin{tabular}{lcp{7cm}}\hline
+options& default & effect \\\hline
+ \texttt{-h (--help)}&- & Produces a simple help message\\
+ \texttt{-i (--in)} &-& The input file. Data can be piped in as well.\\
+ \texttt{-o (--out)} &-& The output file. If none is given, output is written to stdout.\\
+ \texttt{-n (--no-header)} & - & Do not print a headline\\
+ \texttt{-d (--delimiter)} & \textit{tab} & Delimiter\\
+ \texttt{-c (--columns)} &-& The columns to use\\
+\end{tabular}
+\end{table}
+
+\subsubsection{Details}
+\hangindent+25pt \hangafter=1
+\textbf{i, in}: A file containing the table data. If nono is given the data has to be piped in.
+
+\hangindent+25pt \hangafter=1
+\textbf{o, out}: The output is written to the file given with this parameter. If
+no file is given, the output will be printed to the terminal. The output does
+not come in any specific order.
+
+\hangindent+25pt \hangafter=1
+\textbf{n, no-header}: Doesn't print a headline.
+
+\hangindent+25pt \hangafter=1
+\textbf{d, delimiter}: The file delimiter to use. 
+
+\hangindent+25pt \hangafter=1
+\textbf{c, columns}: A string defining the columns to extract. If none is given all columns are extracted. Values are separated by comma. Several consecutive columns can be set by combining the first and the last column by '-'. If a line starts with a delimiter the column after the delimiter is considered to be the second. The order of columns is unimportant, the output will \textbf{always} be ordered from first to last position.
+
+
+
+\subsubsection*{Examples}
+\begin{lstlisting}[language=bash,frame=none,morekeywords={PROMPT}]
+cat test | csv2tex -c 1-2
+\end{lstlisting}
+
+
+
 \chapter{rowmerge}
 
 

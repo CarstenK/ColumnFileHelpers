@@ -175,7 +175,7 @@ main(int argc, char *argv[])
 		("help,h", "Produces this help message")
 		("in,i", po::value<string>(&in_f), "Input file")
 		("out,o", po::value<string>(&out_f), "Output file")
-		("no-header,n", po::value<bool>(&no_header)->default_value(false)->zero_tokens(), "Do not print column identifier")
+		("no-header,n", po::value<bool>(&no_header)->default_value(false)->zero_tokens(), "Do not print a headline")
 	;
 
 	po::options_description table_opts("Input format options");
