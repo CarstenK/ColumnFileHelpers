@@ -50,6 +50,12 @@ using boost::bad_lexical_cast;
 namespace po = boost::program_options;
 
 
+/**
+ * \brief splits a line into tokens
+ * @param s The string to plit
+ * @param delimiters The delimiters to use
+ * @return A vector of tokens.
+ */
 std::vector<std::string>
 split(const std::string &s, const std::string &delimiters)
 {
@@ -72,6 +78,10 @@ split(const std::string &s, const std::string &delimiters)
 }
 
 
+/**
+ * \brief Replaces characters that have special meaning in latex with the backslashed version.
+ * @param line The line in which to replace the characters
+ */
 void
 replace(string &line)
 {
@@ -97,14 +107,14 @@ replace(string &line)
  *
  * The string can contain "," to separate columns and "-" to denote a range of columns.
  * @param column_str The string with the encoded columns.
- * @param[out] colIds The columns id extracted from the column_str, sorted ascending.
+ * @param[out] colIds The columns id extracted from the column_str.
  */
-void
+int
 str2col_id(const string &column_str, vector<int> &colIds)
 {
 	const char *str=column_str.c_str();
 	if ((!isdigit(str[0])) || (!isdigit(str[column_str.size()-1])))
-		return;
+		return -1;
 	bool last_digit=true;
 	for (size_t i =0; i<column_str.size(); ++i)
 	{
@@ -113,7 +123,7 @@ str2col_id(const string &column_str, vector<int> &colIds)
 			if (last_digit)
 				last_digit=false;
 			else
-				return;
+				return -1;
 		}
 		else
 			last_digit=true;
@@ -135,15 +145,33 @@ str2col_id(const string &column_str, vector<int> &colIds)
 	for (i=start; i<=end; ++i)
 		colIds.push_back(i-1);
 
-	sort(colIds.begin(), colIds.end());
+	int maximum=-1;
+	for (const auto value: colIds)
+	{
+		if (value > maximum)
+			maximum = value;
+	}
+	return maximum;
 }
 
 
+/**
+ * Turns a line into a latex table line
+ * @param line The line to convert.
+ * @param outP The stream to print to.
+ * @param delim The delimiter to use.
+ * @param colIds The column ids to use.
+ */
 void
-line2tex(string &line, ostream* outP, const string &delim, vector<int> &colIds)
+line2tex(string &line, ostream* outP, const string &delim, vector<int> &colIds, size_t maximum)
 {
+	if (line.empty())
+		return;
 	replace(line);
 	std::vector<std::string> tokens = split(line, delim);
+	//cout << tokens.size() << " "<< maximum << endl;
+	if (tokens.size() <= maximum)
+		throw std::runtime_error("Not enough columns");
 	if (colIds.empty())
 	{
 		(*outP) << tokens[0];
@@ -207,8 +235,9 @@ main(int argc, char *argv[])
 	}
 
 	vector<int> colIds;
+	size_t maximum = 0;
 	if (!col_str.empty())
-		str2col_id(col_str, colIds);
+		maximum = str2col_id(col_str, colIds);
 
 	ifstream in_F;
 	istream* in_p;
@@ -251,6 +280,7 @@ main(int argc, char *argv[])
 	{
 		vector<string> tokens = split(line, delim);
 		nColumns = tokens.size();
+		maximum = nColumns-1;
 	}
 	else
 		nColumns = colIds.size();
@@ -260,22 +290,30 @@ main(int argc, char *argv[])
 	for (size_t i=0; i<nColumns; ++i)
 		(*outP) << "r";
 	(*outP) <<"}\n";
-
-	if (!no_header)
+	size_t lineNum = 1;
+	try
 	{
-		(*outP) << "\\hline" << "\n";
-		line2tex(line, outP, delim, colIds);
-		(*outP) << "\\hline" << "\n";
+		if (!no_header)
+		{
+			(*outP) << "\\hline" << "\n";
+			line2tex(line, outP, delim, colIds, maximum);
+			(*outP) << "\\hline" << "\n";
+		}
+		else
+			line2tex(line, outP, delim, colIds, maximum);
+
+
+		while (getline(*in_p, line))
+		{
+			++lineNum;
+			line2tex(line, outP, delim, colIds, maximum);
+		}
 	}
-	else
-		line2tex(line, outP, delim, colIds);
-
-
-	while (getline(*in_p, line))
+	catch(std::exception &e)
 	{
-		line2tex(line, outP, delim, colIds);
+		std::cerr << "An error occured when reading line " << lineNum << ": " << e.what()<< endl;
+		exit(EXIT_FAILURE);
 	}
-
 
 	// end table
 	if (!no_header)

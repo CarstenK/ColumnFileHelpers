@@ -37,7 +37,6 @@
 #include <limits>
 
 // boost header
-#include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/regex.hpp>
 
@@ -45,8 +44,6 @@
 
 using namespace std;
 
-using boost::lexical_cast;
-using boost::bad_lexical_cast;
 namespace po = boost::program_options;
 
 double my_max(double a, double b)
@@ -124,7 +121,7 @@ str2col_id(const string &column_str, vector<int> &col_ids)
 void
 parse_line(const string &line, char delim, const vector<int> &col_ids, double *values, size_t n_line, bool merge, double (*analysis_func)(double, double))
 {
-	size_t start=0;
+	//size_t start=0;
 	size_t len = line.length();
 	int curr_col=0;
 	size_t line_pos=0;
@@ -135,12 +132,12 @@ parse_line(const string &line, char delim, const vector<int> &col_ids, double *v
 	while ((i<n_cols) && (line_pos<len))
 	{
 		prev_col=&line_c[line_pos];
-		start=line_pos;
+		//start=line_pos;
 		while ((line_pos != len) && (line_c[line_pos] != delim))
 			++line_pos;
 		if (curr_col==col_ids[i])
 		{
-			values[i] = analysis_func(values[i], lexical_cast<double>(prev_col, line_pos-start));
+			values[i] = analysis_func(values[i], std::stod(prev_col));//, line_pos-start));
 			++i;
 		}
 		++line_pos;
@@ -380,7 +377,7 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-	catch(bad_lexical_cast &)
+	catch(std::exception &e)
 	{
 	    cerr << "Error in line " << line_n << "! Cannot cast value." << endl;
 	    exit(EXIT_FAILURE);
