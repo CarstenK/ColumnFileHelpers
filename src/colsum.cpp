@@ -121,7 +121,6 @@ str2col_id(const string &column_str, vector<int> &col_ids)
 void
 parse_line(const string &line, char delim, const vector<int> &col_ids, double *values, size_t n_line, bool merge, double (*analysis_func)(double, double))
 {
-	//size_t start=0;
 	size_t len = line.length();
 	int curr_col=0;
 	size_t line_pos=0;
