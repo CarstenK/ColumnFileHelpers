@@ -169,7 +169,6 @@ line2tex(string &line, ostream* outP, const string &delim, vector<int> &colIds, 
 		return;
 	replace(line);
 	std::vector<std::string> tokens = split(line, delim);
-	//cout << tokens.size() << " "<< maximum << endl;
 	if (tokens.size() <= maximum)
 		throw std::runtime_error("Not enough columns");
 	if (colIds.empty())
